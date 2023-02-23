@@ -1,10 +1,19 @@
+import { nanoid } from 'nanoid';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { addContact } from 'redux/contacts/slice';
+import { selectContacts } from 'redux/selectors';
+
 import css from './ContactForm.module.css';
 
-function ContactForm({ addContact }) {
+function ContactForm() {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+
+  const contacts = useSelector(selectContacts);
+  const dispatch = useDispatch();
 
   function handleChange({ target }) {
     const { name, value } = target;
@@ -22,7 +31,17 @@ function ContactForm({ addContact }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    addContact({ name, number });
+    if (
+      contacts.some(
+        ({ name: nameFromState }) =>
+          nameFromState.toLowerCase().trim() === name.toLowerCase().trim()
+      )
+    ) {
+      Notify.failure(`${name} is already in contacts!`);
+      return;
+    }
+
+    dispatch(addContact({ id: nanoid(), name, number }));
     setName('');
     setNumber('');
   }
@@ -61,9 +80,5 @@ function ContactForm({ addContact }) {
     </form>
   );
 }
-
-ContactForm.propTypes = {
-  addContact: PropTypes.func.isRequired,
-};
 
 export default ContactForm;
