@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -33,15 +32,15 @@ function ContactForm() {
     e.preventDefault();
     if (
       contacts.some(
-        ({ name: nameFromState }) =>
-          nameFromState.toLowerCase().trim() === name.toLowerCase().trim()
+        ({ name: nameFromReduxState }) =>
+          nameFromReduxState.toLowerCase().trim() === name.toLowerCase().trim()
       )
     ) {
       Notify.failure(`${name} is already in contacts!`);
       return;
     }
 
-    dispatch(addContact({ id: nanoid(), name, number }));
+    dispatch(addContact({ name, number }));
     setName('');
     setNumber('');
   }
